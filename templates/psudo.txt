@@ -1,0 +1,29 @@
+# prepare data using jupyter notebook
+# build flask server
+    # / - home route which displays dashboard
+        # render template index.html
+    # /names - returns JSON list of all names
+    # /otu - returns JSON list of OTU descriptons (lists of bacteria for each sample)
+    # /metadata/<sample> - returns JSON of the metadata which corresponds to the selected <BB_TYPE>  
+    # /wfreq/<sample> - returns integer of the metadata.wfreq for <BB_TYPE>
+    # /samples/<sample> - returns JSON of all the otu_id from a sample
+#Plotly graphs using JS
+    # /names to populate drop down
+        <select>
+            <option value="volvo" onchange='optionChanged(this.value)'>Volvo</option>
+        </select>
+    # pie chart from /samples 
+        plotly.d3.json( 
+        # call the route
+        # process data into 2 lists 
+            # values, lables
+        )
+    # bullble chart same as above but with bubbles
+    # display metadata from route
+# data structure
+otu-id
+otu_id,lowest_taxonomic_unit_found
+samples 
+otu_id,BB_940,..
+metadata
+SAMPLEID,EVENT,ETHNICITY,GENDER,AGE,WFREQ,BBTYPE,LOCATION,COUNTRY012,ZIP012,COUNTRY1319,ZIP1319,DOG,CAT,IMPSURFACE013,NPP013,MMAXTEMP013,PFC013,IMPSURFACE1319,NPP1319,MMAXTEMP1319,PFC1319

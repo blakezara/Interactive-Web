@@ -17,6 +17,32 @@ d3.json("/names", function(error, response) {
     optionChanged(response[0])
 });
 
+var defaultSample = "BB_940"
+
+function init(sample){
+    // sample metadata panel
+    d3.json("/metadata/" + sample, function(error, response){
+        if (error) return console.warn(error);
+
+        // get list of keys from response
+        var responseKeys = Object.keys(response);
+
+        // identify correct div
+        var sampleInfoPanel = document.querySelector("#sample-metadata");
+       
+        // reset HTML to be nothing
+        sampleInfoPanel.innerHTML = null;
+
+        // loop through response keys and create a P element for each including
+        // response key and value
+        for (var i=0; i<responseKeys.length; i++){
+            var dataPoint = document.createElement('p');
+            dataPoint.innerHTML = responseKeys[i] + ": " + response[responseKeys[i]];
+            sampleInfoPanel.appendChild(dataPoint)
+        };
+
+    });
+
  //pie chart 
   var data = [{
     values: [1, 3, 5, 8],
@@ -72,7 +98,7 @@ d3.json("/names", function(error, response) {
 
   Plotly.newPlot('scatterPlot', data, layout);
 
-}
+
 
 function updatePlots(newdata) {
 
@@ -109,10 +135,10 @@ function updatePlots(newdata) {
 // Get html element for pie chart
 var PIE = document.getElementById("pie");
   
-// Restyle the pie chart   
+// Restyle the pie chart-----????
 Plotly.restyle(PIE, "values", [[newdata[0].sample_values][0].slice(0, 10)]);
 Plotly.restyle(PIE, "labels", [[newdata[0].otu_id][0].slice(0, 10)]);
-Plotly.restyle(PIE, "text", [otuDescTop10]);
+Plotly.restyle(PIE, "text", [otuTop10]);
 
 
 // Restyle the scatter plot  
@@ -122,9 +148,10 @@ Plotly.restyle("scatterPlot", "marker.size", [newdata[0].sample_values]);
 
 }
 
+// attempt at the gauge
+
+
 function generateNewGauge(washFreq){
-  
-    console.log("inside generateNewGauge()");
     
     if (washFreq > 4) {
       var level = washFreq * 20;
@@ -155,7 +182,7 @@ function generateNewGauge(washFreq){
       x: [0], y: [0],
       marker: { size: 28, color: '850000' },
       showlegend: false,
-      name: 'scrubs/week',
+      name: 'scrubs per week',
       text: washFreq,
       hoverinfo: 'text+name'
     },
@@ -189,8 +216,8 @@ function generateNewGauge(washFreq){
           color: '850000'
         }
       }],
-      title: '<b>Belly Button Washing Frequency</b> <br> Scrubs per Week',
-      height: 450,
+      title: 'Belly Button Washing Frequency (Scrubs per Week)',
+      height: 400,
       width: 400,
       xaxis: {
         zeroline: false, showticklabels: false,
@@ -204,4 +231,15 @@ function generateNewGauge(washFreq){
   
     Plotly.newPlot('gauge', data, layout);
   
+  }
+
+
+ 
+  
+  // Calling init to create default Pie Chart and Scatter Plot
+  init();
+  
+  // Calling addDropdown to crate dropdown list of samples
+  addDropdown();
+
   }

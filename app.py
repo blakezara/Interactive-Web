@@ -36,19 +36,20 @@ def names():
 def otu():
 
     otu_descriptions = session.query(OTU.lowest_taxonomic_unit_found).all()
-    otu_dict = {}
-    for i in otu_descriptions:
-        otu_dict[i[0]] = i[1]
+    otu_descriptions_list = [x for (x), in otu_descriptions]
+    return jsonify(otu_descriptions_list)
+    
     return jsonify(otu_dict)
+
 
 
 # metadata for a specific sample
 @app.route('/metadata/<sample>', methods=['POST','GET'])
 def sample_query(sample):
     sample_name = sample.replace("BB_", "")
-    result = session.query(SamplesMetadata.AGE, SamplesMetadata.BBTYPE, SamplesMetadata.ETHNICITY, SamplesMetadata.GENDER, SamplesMetadata.LOCATION, SamplesMetadata.SAMPLEID).filter_by(SAMPLEID = sample_name).all()
+    result = session.query(SamplesMetadata.AGE, SamplesMetadata.BBTYPE, SamplesMetadata.ETHNICITY, SamplesMetadata.GENDER, SamplesMetadata.LOCATION, SamplesMetadata.SAMPLEID).filter_by(SAMPLEID = "940").all()
     record = result[0]
-    record_dict = {
+    result_dict = {
         "AGE": record[0],
         "BBTYPE": record[1],
         "ETHNICITY": record[2],
@@ -56,34 +57,25 @@ def sample_query(sample):
         "LOCATION": record[4],
         "SAMPLEID": record[5]
     }
+
     return jsonify(record_dict)
     
 
 @app.route('/wfreq/<sample>', methods=['POST','GET'])
 def wfreq(sample):
-
-    results = session.query(SamplesMetadata.WFREQ).filter(SamplesMetadata.SAMPLEID == sample[3:]).all()
-    
+    sample_name = sample.replace("BB_", "")
+    result = session.query(SamplesMetadata.WFREQ).filter_by(SAMPLEID = "940").all()
     return jsonify(results[0][0])
 
 @app.route('/samples/<sample>', methods=['POST','GET'])
-def samples(sample):
+def sample(sample):
+    sample_query = "Samples." + sample
+    results = session.query(Samples.otu_id, sample_query).order_by(sample_query).desc().all()
+    sample_values = [result[x][1] for x in range(len(result))]
+    dict_list = [{"otu_ids": otu_ids}, {"sample_values": sample_values}]
+    return dict_list
 
-    
-    results = session.query(Samples.otu_id,getattr(Samples, sample)).order_by(getattr(Samples, sample).desc()).all()
-    results
-    dict1, dict2 = {}, {}
-    list1, list2, list3 = [], [], []
-    for x in results:
-        if(x[1] > 0):
-            list1.append(x[0])
-            list2.append(x[1])
-    dict1['otu_id'] = list1
-    dict1['sample_values'] = list2
-    list3.append(dict1)
-    list3
-
-    return jsonify(list3)
+    return jsonify(dict_list)
 
 
 
